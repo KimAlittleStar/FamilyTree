@@ -1,15 +1,18 @@
 {
-    "configurations": [{
-        "name": "Win32",
-        "includePath": [
-            "${workspaceFolder}/**",
-            "${workspaceFolder}/cstd"
-        ],
-        "defines": [
-            "_DEBUG",
-            "UNICODE",
-            "_UNICODE"
-        ]
-    }],
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/cstd",
+                "${workspaceFolder}/debug"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ]
+        }
+    ],
     "version": 4
 }

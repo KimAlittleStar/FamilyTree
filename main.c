@@ -1,48 +1,101 @@
-#include "familytree.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "familytree.h"
 Human randHuman(void);
+Human createHuman(char *name, char *date, Gender_e g);
 
 int main(void)
 {
-    printf("hello world\n");
-    Human or ;
-    strcpy(or.name, "å°æ˜");
-    or.gender = Gender_Man;
-    sprintf(or.birthday, "%s", __DATE__);
-    FamilyTree *treem = newFamilyTree(or, "è¿™æ˜¯ä¸€ä¸ªæ‚²ä¼¤çš„å®¶æ—");
-    strcpy(or.name, "å°çº¢");
-    or.gender = Gender_Woman;
-    FamilyTree *treeh = newFamilyTree(or, "è¿™æ˜¯ä¸€ä¸ªæ‚²ä¼¤çš„å®¶æ—çš„è€å©†å®¶æ—");
+    mwInit();
+    ///< ÌìµØÉúĞ¡Ã÷
+    FamilyTree *family = newFamilyTree(createHuman("Ğ¡Ã÷", "1949-11-11", Gender_Man), "ÌìµØÉúĞ¡Ã÷");
 
-    marryPeople(treeh->root, treem->root);
-    insertNewBaby(treem->root, randHuman());
-    deleteFamilyTree(treem);
-    deleteFamilyTree(treeh);
+    FamilyNode *alittleMing = findFamilyNodeByName(family, "Ğ¡Ã÷");
+
+    marryPeople(
+        newFamilyNode(createHuman("ÍÜÍÜ", "1949-12-12", Gender_Woman)),
+        alittleMing);
+
+    //Éúº¢×Ó½Ğ Îä´óÀÉ ÎäËÉ
+    insertNewBaby(alittleMing, createHuman("Îä´óÀÉ", "1969-11-11", Gender_Man));
+    insertNewBaby(alittleMing, createHuman("ÎäËÉ", "1970-11-11", Gender_Man));
+
+    //Îä´óÀÉ½á»éÀ²
+    FamilyNode *bigMan = findFamilyNodeByName(family, "Îä´óÀÉ");
+    marryPeople(newFamilyNode(createHuman("ÅË½ğÁ«", "1970-12-12", Gender_Woman)),
+                bigMan);
+
+    //ÎäËÉ½á»éÀ²
+    FamilyNode *tigerKiller = findFamilyNodeByName(family, "ÎäËÉ");
+    marryPeople(newFamilyNode(createHuman("ÓñÀ¼", "1971-11-11", Gender_Woman)),
+                tigerKiller);
+
+    // ÉúÍŞ ing
+    insertNewBaby(bigMan, createHuman("Î÷ºìÇß", "1990-11-11", Gender_Woman));
+    insertNewBaby(bigMan, createHuman("ÎäÔÆ", "1993-11-11", Gender_Man));
+
+    insertNewBaby(tigerKiller, createHuman("ÎäÁú", "1995-11-11", Gender_Man));
+    insertNewBaby(tigerKiller, createHuman("ÎäÀö", "1996-11-11", Gender_Woman));
+
+    //Ğ¡Ã÷µÄËï×ÓÃÇÒ²Òª½á»éÁË~
+    FamilyNode *cloud = findFamilyNodeByName(family, "ÎäÔÆ");
+    marryPeople(newFamilyNode(createHuman("¾²Ïã", "1997-7-17", Gender_Woman)),
+                cloud);
+
+    marryPeople(newFamilyNode(createHuman("ÅËÓÂ", "1989-8-27", Gender_Man)),
+                findFamilyNodeByName(family, "Î÷ºìÇß"));
+
+    marryPeople(newFamilyNode(createHuman("ÀîÄÈ", "1996-8-08", Gender_Woman)),
+                findFamilyNodeByName(family, "ÎäÁú"));
+
+    //ÎäÔÆµÄ±¦±¦³öÉúÁË
+    insertNewBaby(cloud, createHuman("ÎäÃ«", "2020-01-03", Gender_Woman));
+    insertNewBaby(cloud, createHuman("ÎäÖØ", "2020-01-03", Gender_Man));
+
+    printFamily(family->root);
+
+    K_INFOMATION("·¢ÏÖ%sµÄÀÏÆÅ%s¸ãÍâÓö,ËûµÄÅ®¶ù²»ÊÇËûÇ×ÉúµÄ~ºÃ²Ò°¡~\n\n", bigMan->man.name, bigMan->soulmate->man.name);
+
+    K_INFOMATION("½« Î÷ºìÇß Ìß³ö×åÆ×~!!!%s", "\n");
+    removeFamilyNode(findFamilyNodeByName(family, "Î÷ºìÇß"));
+
+    K_INFOMATION("×îÖÕµÄ×åÆ×Îª%s", "\n");
+    printFamily(family->root);
+
+    K_INFOMATION("Õ¹Ê¾Îä´óÀÉµÄĞÖµÜ%s", "\n");
+    printBrother(bigMan);
+
+    K_INFOMATION("Õ¹Ê¾ÎäÔÆµÄÌÃĞÖµÜ%s", "\n");
+    printCousin(cloud);
+
+    deleteFamilyTree(family);
+
+    mwTerm();
     return 0;
 }
 
 const char *firstName[] = {
-    "èµµ",
-    "é’±",
-    "å­™",
-    "æ",
-    "å‘¨",
-    "å´",
-    "éƒ‘",
-    "ç‹",
+    "ÕÔ",
+    "Ç®",
+    "Ëï",
+    "Àî",
+    "ÖÜ",
+    "Îâ",
+    "Ö£",
+    "Íõ",
 };
 const char *lastName[] = {
-    "ç”²",
-    "ä¹™ ",
-    "ä¸™ ",
-    "ä¸",
-    "æˆŠ",
-    "å·±",
-    "åºš",
-    "è¾›",
-    "å£¬",
-    "è‘µ"};
+    "¼×",
+    "ÒÒ ",
+    "±û ",
+    "¶¡",
+    "Îì",
+    "¼º",
+    "¸ı",
+    "ĞÁ",
+    "ÈÉ",
+    "¿û"};
 Human randHuman(void)
 {
     Human ret;
@@ -54,4 +107,35 @@ Human randHuman(void)
             rand() % 30 + 1, rand() % 24 + 1,
             rand() % 61);
     return ret;
+}
+Human createHuman(char *name, char *date, Gender_e g)
+{
+    Human ret;
+    strcpy(ret.name, name);
+    strcpy(ret.birthday, date);
+    ret.gender = g;
+    return ret;
+}
+
+void maintest1(void)
+{
+    printf("hello world\n");
+    Human or ;
+    strcpy(or.name, "Ğ¡Ã÷");
+    or.gender = Gender_Man;
+    sprintf(or.birthday, "%s", __DATE__);
+    FamilyTree *treem = newFamilyTree(or, "ÕâÊÇÒ»¸ö±¯ÉËµÄ¼Ò×å");
+    strcpy(or.name, "Ğ¡ºì");
+    or.gender = Gender_Woman;
+    FamilyTree *treeh = newFamilyTree(or, "ÕâÊÇÒ»¸ö±¯ÉËµÄ¼Ò×åµÄÀÏÆÅ¼Ò×å");
+
+    marryPeople(treeh->root, treem->root);
+    insertNewBaby(treem->root, randHuman());
+    {
+        FamilyNode *p = findParent(treem->root->children);
+        printf("papa = %s,mama = %s\n", p->man.name, p->soulmate->man.name);
+    }
+    printf("\n\n\n");
+    printFamily(treem->root);
+    deleteFamilyTree(treem);
 }

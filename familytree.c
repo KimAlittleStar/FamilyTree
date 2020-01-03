@@ -1,7 +1,7 @@
-#include "familytree.h"
 #include <stdlib.h>
 #include <string.h>
 
+#include "familytree.h"
 FamilyTree *newFamilyTree(Human origin, char *introduce)
 {
     FamilyTree *ret = (FamilyTree *)malloc(sizeof(FamilyTree));
@@ -29,13 +29,10 @@ int insertNewBaby(FamilyNode *parent, Human baby)
         return 0;
     if (parent->soulmate == NULL)
     {
-        K_ERROR("%sæ²¡æœ‰çˆ±äºº\n", parent->man.name);
+        K_ERROR("%sÃ»ÓÐ°®ÈË\n", parent->man.name);
         return 0;
     }
-    FamilyNode *chld = (FamilyNode *)malloc(sizeof(FamilyNode));
-    memset(chld, 0, sizeof(FamilyNode));
-
-    chld->man = baby;
+    FamilyNode *chld = newFamilyNode(baby);
     chld->parent = parent;
     if (parent->children == NULL)
     {
@@ -50,12 +47,12 @@ int insertNewBaby(FamilyNode *parent, Human baby)
         tmp->brother = chld;
         chld->deep = tmp->deep;
     }
-    K_INFOMATION("%så’Œ%sçš„ç»“åˆåœ¨%sè¯žç”Ÿäº†ä¸€åå«%sçš„å°%så­©\n",
+    K_INFOMATION("%sºÍ%sµÄ½áºÏÔÚ%sµ®ÉúÁËÒ»Ãû½Ð%sµÄÐ¡%sº¢\n",
                  parent->man.name,
                  parent->soulmate->man.name,
                  chld->man.birthday,
                  chld->man.name,
-                 (chld->man.gender == Gender_Man) ? ("ç”·") : ("å¥³"));
+                 (chld->man.gender == Gender_Man) ? ("ÄÐ") : ("Å®"));
     return 1;
 }
 int marryPeople(FamilyNode *wifi, FamilyNode *husband)
@@ -64,20 +61,21 @@ int marryPeople(FamilyNode *wifi, FamilyNode *husband)
         return 0;
     if (wifi->man.gender == husband->man.gender)
     {
-        K_ERROR("%så’Œ%sæ€Žä¹ˆèƒ½æž%så‘¢?\n", husband->man.name, wifi->man.name, (wifi->man.gender == Gender_Man) ? ("åŸº") : ("æ‹‰æ‹‰"));
+        K_ERROR("%sºÍ%sÔõÃ´ÄÜ¸ã%sÄØ?\n", husband->man.name, wifi->man.name, (wifi->man.gender == Gender_Man) ? ("»ù") : ("À­À­"));
         return 0;
     }
     if (husband->man.gender == Gender_Woman)
     {
-        K_WARNINR("%sæ˜¯ä¸Šé—¨å¥³å©¿\n", husband->man.name);
+        K_WARNINR("%sÊÇÉÏÃÅÅ®Ðö\n", wifi->man.name);
     }
     wifi->soulmate = husband;
     husband->soulmate = wifi;
-    K_CONGRATULATION("%så’Œ%så–œç»“è¿žç†,ç¥ä»–ä»¬ç™¾å¹´å¥½åˆ\n", husband->man.name, wifi->man.name);
+    K_CONGRATULATION("%sºÍ%sÏ²½áÁ¬Àí,×£ËûÃÇ°ÙÄêºÃºÏ\n", husband->man.name, wifi->man.name);
     return 1;
 }
 int editFamilyNode(FamilyNode *old, FamilyNode *newone)
 {
+    // ²»¿¼ÂÇ,½Ï¸´ÔÓ
     return 0;
 }
 void removeFamilyNode(FamilyNode *node)
@@ -93,7 +91,7 @@ void removeFamilyNode(FamilyNode *node)
         FamilyNode *tmp = node->parent->children;
         if (tmp == node)
         {
-            node->parent->children = NULL;
+            node->parent->children = node->brother;
         }
         else
         {
@@ -102,6 +100,8 @@ void removeFamilyNode(FamilyNode *node)
             tmp->brother = node->brother;
         }
     }
+    if (node->soulmate != NULL && node->soulmate->parent == NULL)
+        free(node->soulmate);
     free(node);
 }
 
@@ -152,7 +152,7 @@ void printBrother(FamilyNode *node)
     if (node == NULL)
         return;
     FamilyNode *tmp = NULL;
-    K_PRINT("%sçš„å…„å¼Ÿå§å¦¹æœ‰:", node->man.name);
+    K_PRINT("%sµÄÐÖµÜ½ãÃÃÓÐ:", node->man.name);
     if (node->parent != NULL)
         tmp = node->parent->children;
     else
@@ -171,7 +171,7 @@ void printCousin(FamilyNode *node)
         return;
     FamilyNode *tmpuncle = NULL;
     FamilyNode *tmpbro = NULL;
-    K_PRINT("%sçš„å ‚å…„å¼Ÿå§å¦¹æœ‰:", node->man.name);
+    K_PRINT("%sµÄÌÃÐÖµÜ½ãÃÃÓÐ:", node->man.name);
     if (node->parent->parent == NULL)
         tmpuncle = node->parent->brother;
     else
@@ -194,8 +194,59 @@ int compareMan(Human *a, Human *b)
     int ret = -1;
     if ((ret = strcmp(a->name, b->name)) == 0)
     {
-        return strcmp(a->birthday, b->birthday);
+        if (*a->birthday == 0 || *b->birthday == 0)
+            return 0;
+        else
+            return strcmp(a->birthday, b->birthday);
     }
     else
         return ret;
+}
+
+FamilyNode *newFamilyNode(Human man)
+{
+    FamilyNode *ret = (FamilyNode *)malloc(sizeof(FamilyNode));
+    memset(ret, 0, sizeof(FamilyNode));
+    ret->man = man;
+    return ret;
+}
+
+void printFamily(FamilyNode *node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    for (int i = 0; i < node->deep; i++)
+    {
+        char *c = " ";
+        if (i == node->deep - 2)
+            c = "©¸";
+        else if (i == node->deep - 1)
+            c = "--";
+        else
+            c = "  ";
+
+        K_PRINT("%s", c);
+    }
+    K_PRINT("%s:%sÉú,ÐÔ±ð %s", node->man.name,
+            node->man.birthday, GENDER_TO_STR(node->man.gender));
+    if (node->soulmate != NULL)
+    {
+        K_PRINT(",°éÂÂ: %s, ÐÔ±ð: %s",
+                node->soulmate->man.name,
+                GENDER_TO_STR(node->soulmate->man.gender));
+    }
+    K_PRINT("%s", "\n");
+    printFamily(node->children);
+    printFamily(node->brother);
+}
+
+FamilyNode *findFamilyNodeByName(FamilyTree *tree, char *name)
+{
+    Human s;
+    memset(&s, 0, sizeof(Human));
+    strcpy(s.name, name);
+    return findFamilyNodeByNode(tree->root, &s);
 }

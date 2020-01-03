@@ -1,9 +1,10 @@
 #ifndef _familytree_h
 #define _familytree_h
-#include "include.h"
 #include <stdio.h>
 
+#include "include.h"
 #define K_CONGRATULATION(fmt, ...) K_LOG(Congratulation, fmt, ##__VA_ARGS__)
+#define GENDER_TO_STR(gend) (((gend) == Gender_Man) ? ("ÄĞ") : ("Å®"))
 
 typedef enum
 {
@@ -27,11 +28,11 @@ typedef struct _FamilyNode
     int deep;
 } FamilyNode;
 
-// def Family Tree å®šä¹‰æ—è°±
+// def Family Tree ¶¨Òå×åÆ×
 typedef struct _FamilyTree
 {
     FamilyNode *root;
-    char introduce[200]; ///< å¯¹äºè¯¥æ—è°±çš„ç®€å•ä»‹ç»
+    char introduce[200]; ///< ¶ÔÓÚ¸Ã×åÆ×µÄ¼òµ¥½éÉÜ
 } FamilyTree;
 
 FamilyTree *newFamilyTree(Human origin, char *introduce);
@@ -44,13 +45,17 @@ void removeFamilyNode(FamilyNode *node);
 
 FamilyNode *findFamilyNode(FamilyTree *tree, Human man);
 FamilyNode *findFamilyNodeByNode(FamilyNode *node, Human *man);
+FamilyNode *findFamilyNodeByName(FamilyTree *tree, char *name);
 
 FamilyNode *findOrigin(FamilyNode *node, int generation);
 FamilyNode *findParent(FamilyNode *node);
 
 void printBrother(FamilyNode *node);
 void printCousin(FamilyNode *node);
+void printFamily(FamilyNode *node);
 
 extern int compareMan(Human *a, Human *b);
+
+FamilyNode *newFamilyNode(Human man);
 
 #endif // _familytree_h
